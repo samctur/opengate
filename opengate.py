@@ -383,7 +383,7 @@ def _parse_cliargs(node, cliargs=CliArg(), heap=HeapGate()):
                 return False
             else:
                 heap._countries.append(node._country)
-        elif node._country in cliargs._country_:
+        elif node._country in cliargs._country_blacklist:
             return False
     if cliargs._ip_whitelist:
         if node._ip not in cliargs._ip_whitelist:

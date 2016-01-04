@@ -257,6 +257,11 @@ def _getall(cliargs=CliArg(), heap=HeapGate()):
             print("parsing...\n  {0}".format(x))
         "parse each vpn on site"
         count += _parse(x, cliargs, heap)
+    "check if further parsing needed"
+    if heap._countries:
+        for x in heap._countries:
+            print(x)
+        sys.exit(0)
     print("found {0} matching VPNs".format(count))
     _getbest(cliargs, heap)
 
@@ -318,7 +323,6 @@ def _getvpn(node, cliargs=CliArg()):
         for x in range(len(vpns_)):
             if str(vpns_[x]).find('tcp') >= 0:
                 vpn_.append(vpns_[x])
-    print vpns_
     if vpn_:
         "remove garbage"
         vpn = vpn_[0]
@@ -370,7 +374,6 @@ def _parse_cliargs(node, cliargs=CliArg(), heap=HeapGate()):
             if node._country in heap._countries:
                 return False
             else:
-                print(node._country)
                 heap._countries.append(node._country)
         elif node._country not in cliargs._country_whitelist:
             return False
@@ -379,7 +382,6 @@ def _parse_cliargs(node, cliargs=CliArg(), heap=HeapGate()):
             if node._country in heap._countries:
                 return False
             else:
-                print(node._country)
                 heap._countries.append(node._country)
         elif node._country in cliargs._country_:
             return False

@@ -3,29 +3,41 @@
 short script to check available VPNs on vpngate.net
 and parse the desired vpn.
 
-Dependencies:
+Created by:
 
-  python2.7.X
+  * kamiunix <kamiunix@tuta.io>
 
-  openvpn
 
-Usage:
+## Building
 
-Currently only obtains openvpn formats from vpn servers.
-Once installed, openvpn -h for detailed usage.
-man page to be added...
+Start by grabbing the code using Git. If you're planning to contribute, fork the project on GitHub.
 
-Install:
+    $ git clone https://github.com/kamiunix/opengate.git
+    $ git submodule update --init
 
-  If you do not have a home bin directory:
-  mkdir ~/bin; cp ./opengate.py ~/bin/opengate; chmod 700 ~/bin/opengate
+## Dependencies
 
-  Otherwise, simply move the script into your bin directory.
+  1. python2.7.X
 
-  If you have not added your home directory to $PATH, append the
+  2. openvpn
+
+## Usage
+
+Currently only obtains openvpn formats from vpn servers. Please run openvpn -h for detailed usage once installed.
+A man page is on its way...
+
+## Install
+
+  1. If you do not have a home bin directory:
+  $ mkdir ~/bin; cp ./opengate.py ~/bin/opengate; chmod 700 ~/bin/opengate
+
+    Otherwise, simply move the script into your bin directory.
+
+  2. If you have not added your home directory to $PATH, append the
   following to your .bashrc or .profile:
-  PATH="$HOME/bin:$PATH"
+  $ PATH="$HOME/bin:$PATH"
 
-  Simplified:
-  run ./install.sh 
+  1. Simplified:
+  $ ./install.sh 
   
+

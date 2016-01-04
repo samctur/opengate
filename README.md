@@ -1,4 +1,5 @@
-# BAT0
+#opengate
+
 short script to check available VPNs on vpngate.net
 and parse the desired vpn.
 

@@ -7,7 +7,7 @@ of the best vpns at moment of call. Network connection mandatory.
 Copyright (C) 2015  kamiunix
 
 Author:
-    kamiunix <kamiunix@gmail.com>
+    kamiunix <kamiunix@tuta.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

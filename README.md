@@ -5,14 +5,14 @@ and parse the desired vpn.
 
 Dependencies:
 
-  python2.7.X
+  python2.7.X\n
   openvpn
 
 Usage:
 
-  Currently only obtains openvpn formats from vpn servers.
-  Once installed, openvpn -h for detailed usage.
-  man page to be added...
+\tCurrently only obtains openvpn formats from vpn servers.
+\tOnce installed, openvpn -h for detailed usage.
+\tman page to be added...
 
 Install:
 

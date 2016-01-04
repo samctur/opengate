@@ -17,9 +17,9 @@ Start by grabbing the code using Git. If you're planning to contribute, fork the
 
 ## Dependencies
 
-  1. python2.7.X
+  * python2.7.X
 
-  2. openvpn
+  * openvpn
 
 ## Usage
 
@@ -36,9 +36,11 @@ A man page is on its way...
 
   2. If you have not added your home directory to $PATH, append the
   following to your .bashrc or .profile:
-  $ PATH="$HOME/bin:$PATH"
 
-  1. Simplified:
+    PATH="$HOME/bin:$PATH"
+
+  3. Simplified:
+
   $ ./install.sh 
   
 

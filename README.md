@@ -29,6 +29,7 @@ A man page is on its way...
 ## Install
 
   1. If you do not have a home bin directory:
+
   $ mkdir ~/bin; cp ./opengate.py ~/bin/opengate; chmod 700 ~/bin/opengate
 
     Otherwise, simply move the script into your bin directory.

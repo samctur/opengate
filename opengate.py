@@ -25,10 +25,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import sys
-import urllib2
 import re
 import getopt
-
+import urllib2
+import subprocess
 
 class OpenNode(object):
     """
@@ -424,6 +424,12 @@ def main(argv):
             _get_countries()
             sys.exit(0)
         elif opt in ('--ping'):
+            ping = subprocess.Popen(
+                    ['ping', '-c', '5', 'www.vpngate.net'],
+                    stdout = subprocess.PIPE,
+                    stderr = subprocess.PIPE)
+            out, error = ping.communicate()
+            print(out)
             sys.exit(0)
         elif opt in ('-v'):
             cliargs._verbose = arg

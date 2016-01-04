@@ -1,9 +1,20 @@
-#opengate
+#opengate project
 
 short script to check available VPNs on vpngate.net
 and parse the desired vpn.
 
-Install/Usage:
+Dependencies:
+
+  python2.7.X
+  openvpn
+
+Usage:
+
+  Currently only obtains openvpn formats from vpn servers.
+  Once installed, openvpn -h for detailed usage.
+  man page to be added...
+
+Install:
 
   If you do not have a home bin directory,
 

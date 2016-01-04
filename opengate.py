@@ -71,7 +71,7 @@ class OpenNode(object):
 
     def __str__(self):
         """printable tuples"""
-        print("{0} :: {1} :: {2} users :: {3} Mbps :: {4}ms\n{5}".format(self._country,self._ip,self._total,self._mbps,self._ms,self._vpn))
+        print(" {0} :: {1} :: {2} users :: {3} Mbps :: {4}ms\n {5}".format(self._country,self._ip,self._total,self._mbps,self._ms,self._vpn))
 
     @staticmethod
     def __doc__():
@@ -104,14 +104,14 @@ class HeapGate(object):
 
     @staticmethod
     def __doc__():
-        print("opengate is an attempt at vpn connection\
+        print(" opengate is an attempt at vpn connection\
                 scripting using vpngate's free vpns and\
                 the open source openvpn software")
 
     def __str__(self):
-        "Heap string"
-        for x in self._heap:
-            x.__str__()
+        "Heap traversal"
+        for x in range(len(self._heap)):
+            self._heap[x].__str__()
 
     def size(self):
         "size of heap"
@@ -229,11 +229,49 @@ class CliArg(object):
     @staticmethod
     def __doc__():
         """Documentation"""
-        print("struct storing argument information for priority parsing")
+        print(" struct storing argument information for priority parsing")
 
     def __str__(self):
         """String print of CliArg"""
-        print("{0}, c={2}, C={3}, s={4}, S={5}, u={6}, U={7}, m={8}, M={9}".format(self._site, self._country_whitelist, self._country_blacklist, self._ip_whitelist, self._ip_blacklist, self._users_min, self._users_max, self._mbps_min, self._ms_max))
+        print(" {0}, c={1}, C={2}, s={3}, S={4}, u={5}, U={6}, m={7}, M={8}".format(self._site, self._country_whitelist, self._country_blacklist, self._ip_whitelist, self._ip_blacklist, self._users_min, self._users_max, self._mbps_min, self._ms_max))
+
+    def _parse_cliargs(self, node, heap=HeapGate()):
+        "parse VPNs found, only adding if desired"
+        if self._country_whitelist:
+            if self._country_whitelist in "--list":
+                if node._country in heap._countries:
+                    return False
+                else:
+                    heap._countries.append(node._country)
+            elif node._country not in self._country_whitelist:
+                return False
+        if self._country_blacklist:
+            if self._country_blacklist in "--list":
+                if node._country in heap._countries:
+                    return False
+                else:
+                    heap._countries.append(node._country)
+        elif node._country in self._country_blacklist:
+            return False
+        if self._ip_whitelist:
+            if node._ip not in self._ip_whitelist:
+                return False
+        if self._ip_blacklist:
+            if node._ip in self._ip_blacklist:
+                return False
+        if self._users_min is not None:
+            if node._total < self._users_min:
+                return False
+        if self._users_max is not None:
+            if node._total > self._users_max:
+                return False
+        if self._mbps_min is not None:
+            if node._mbps < self._mbps_min:
+                return False
+        if self._ms_max is not None:
+            if node._ms > self._ms_max:
+                return False
+        return True
 
 
 """
@@ -252,9 +290,12 @@ def _getall(cliargs=CliArg(), heap=HeapGate()):
                 \n  .....\
                 \n  check network connectivity and site status.")
         sys.exit(1)
+    "check verbose"
+    if cliargs._verbose:
+        print(" . . .\n parsing...\n . . .")  
+        cliargs.__str__()
+        print(' . . .')
     for x in re.findall(recomp, data):
-        if cliargs._verbose:
-            print("parsing...\n  {0}".format(x))
         "parse each vpn on site"
         count += _parse(x, cliargs, heap)
     "check if further parsing needed"
@@ -262,7 +303,9 @@ def _getall(cliargs=CliArg(), heap=HeapGate()):
         for x in heap._countries:
             print(x)
         sys.exit(0)
-    print("found {0} matching VPNs".format(count))
+    if cliargs._verbose:
+        print(" found {0} matching VPNs\n . . .".format(count))
+        heap.__str__()
     _getbest(cliargs, heap)
 
 def _getbest(cliargs=CliArg(), heap=HeapGate()):
@@ -273,13 +316,14 @@ def _getbest(cliargs=CliArg(), heap=HeapGate()):
         max_node._downloads = _getvpn(max_node, cliargs)
         if max_node._downloads is not None:
             found = True
-    print("Found a matching VPN\
-      \n*\t*\t*\t*\t*")
-    max_node.__str__()
-    print("*\t*\t*\t*\t*")
     vpn = max_node._downloads
-    print(vpn)
-    print("*\t*\t*\t*\t*")
+    if cliargs._verbose:
+        print(" Found a matching VPN\
+        \n *\t*\t*\t*\t*")
+        max_node.__str__()
+        print(" *\t*\t*\t*\t*")
+        print(" {0}".format(vpn))
+        print(" *\t*\t*\t*\t*")
     try:
         response = urllib2.urlopen(vpn)
     except:
@@ -296,7 +340,7 @@ def _getbest(cliargs=CliArg(), heap=HeapGate()):
                 \n  .....\
                 \n  check file permisions.")
         sys.exit(1)
-    print("{0} created in {1}".format(file_, '/tmp/vpngate.ovpn'))
+    print(" {0} created in {1}".format(file_, '/tmp/vpngate.ovpn'))
 
 def _getvpn(node, cliargs=CliArg()):
     """Get download link of given opennode"""
@@ -362,48 +406,10 @@ def _parse(x, cliargs=CliArg(), heap=HeapGate()):
     vpn = cliargs._site+vpn[0]
     node = OpenNode(string=x,country=country,ip=ip,total=users,mbps=mbps,ms=ms,vpn=vpn)
     "check if vpn fits wanted cli arguments"
-    if _parse_cliargs(node, cliargs, heap):
+    if cliargs._parse_cliargs(node, heap):
         heap.insert_node(node)
         return 1
     return 0
-
-def _parse_cliargs(node, cliargs=CliArg(), heap=HeapGate()):
-    "parse VPNs found, only adding if desired"
-    if cliargs._country_whitelist:
-        if cliargs._country_whitelist in "--list":
-            if node._country in heap._countries:
-                return False
-            else:
-                heap._countries.append(node._country)
-        elif node._country not in cliargs._country_whitelist:
-            return False
-    if cliargs._country_blacklist:
-        if cliargs._country_blacklist in "--list":
-            if node._country in heap._countries:
-                return False
-            else:
-                heap._countries.append(node._country)
-        elif node._country in cliargs._country_blacklist:
-            return False
-    if cliargs._ip_whitelist:
-        if node._ip not in cliargs._ip_whitelist:
-            return False
-    if cliargs._ip_blacklist:
-        if node._ip in cliargs._ip_blacklist:
-            return False
-    if cliargs._users_min is not None:
-        if node._total < cliargs._users_min:
-            return False
-    if cliargs._users_max is not None:
-        if node._total > cliargs._users_max:
-            return False
-    if cliargs._mbps_min is not None:
-        if node._mbps < cliargs._mbps_min:
-            return False
-    if cliargs._ms_max is not None:
-        if node._ms > cliargs._ms_max:
-            return False
-    return True
 
 def main(argv):
     """parse cli arguments"""
@@ -434,7 +440,8 @@ def main(argv):
             print(out)
             sys.exit(0)
         elif opt in ('-v'):
-            cliargs._verbose = arg
+            print(' . . .\n initializing arguments\n . . .')
+            cliargs._verbose = True
         elif opt in ('-c', '--country-whitelist'):
             cliargs._country_whitelist = arg
         elif opt in ('-C', '--country-blacklist'):

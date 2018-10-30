@@ -185,7 +185,7 @@ class CliArg(object):
     """
     keeps track of command line arguments passed
     """
-    def __init__(self, site='www.vpngate.net/en/',v=False,  p='tcp', c=[], C=[], s=[], S=[], u=None, U=None, m=None, M=None):
+    def __init__(self, site='www.vpngate.net/en/',v=False,  p='tcp', c=[], C=[], s=[], S=[], u=None, U=None, m=None, M=None, k=None):
         """Constructor"""
         self._site = site 
         "vpn website"
@@ -209,11 +209,14 @@ class CliArg(object):
         "minimum mbps of vpn"
         self._ms_max = M 
         "max ms of vpn"
+        self._skip = k 
+        "number of vpns to skip"
 
     site = property(fget = lambda self: self._site, doc="site used in scraping")
     verbose = property(fget = lambda self: self._verbose, doc="verbose mode pairity")
     proto = property(fget = lambda self: self._proto, doc="protocol of vpn")
     ms_max = property(fget = lambda self: self._ms_max, doc="maximum latency of vpn")
+    skip = property(fget = lambda self: self._skip, doc="number of vpns to skip from top")
     mbps_min = property(fget = lambda self: self._mbps_min, doc="minimum mbps of vpn")
     users_min = property(fget = lambda self: self._users_min, doc="minimum users on vpn")
     users_max = property(fget = lambda self: self._users_max, doc="maximum users on vpn")
@@ -233,7 +236,7 @@ class CliArg(object):
 
     def __str__(self):
         """String print of CliArg"""
-        print(" {0}, c={1}, C={2}, s={3}, S={4}, u={5}, U={6}, m={7}, M={8}".format(self._site, self._country_whitelist, self._country_blacklist, self._ip_whitelist, self._ip_blacklist, self._users_min, self._users_max, self._mbps_min, self._ms_max))
+        print(" {0}, c={1}, C={2}, s={3}, S={4}, u={5}, U={6}, m={7}, M={8} k={9}".format(self._site, self._country_whitelist, self._country_blacklist, self._ip_whitelist, self._ip_blacklist, self._users_min, self._users_max, self._mbps_min, self._ms_max, self._skip))
 
     def _parse_cliargs(self, node, heap=HeapGate()):
         "parse VPNs found, only adding if desired"
@@ -310,12 +313,16 @@ def _getall(cliargs=CliArg(), heap=HeapGate()):
 
 def _getbest(cliargs=CliArg(), heap=HeapGate()):
     """Get best vpn from AVL Heap"""
+    kskip = cliargs._skip;
     found = False
     while not found and len(heap._heap) is not 0:
         max_node = heap.delete_max()
         max_node._downloads = _getvpn(max_node, cliargs)
         if max_node._downloads is not None:
-            found = True
+            if kskip == 0:
+                found = True
+            else:
+                kskip = kskip-1
     vpn = max_node._downloads
     if cliargs._verbose:
         print(" Found a matching VPN\
@@ -415,8 +422,8 @@ def main(argv):
     """parse cli arguments"""
 
     try: 
-        opts, args = getopt.getopt(argv[1:], 'hvc:C:s:S:u:U:m:M:P:', \
-                ['help', 'ping', 'country-whitelist=', 'country-blacklist=', 'ip-whitelist=', 'ip-blacklist=', 'max-users=', 'min-users=', 'min-mbps=', 'max-ms=', 'proto=', 'list'])
+        opts, args = getopt.getopt(argv[1:], 'hvc:C:s:S:u:U:m:M:P:k:', \
+                ['help', 'ping', 'country-whitelist=', 'country-blacklist=', 'ip-whitelist=', 'ip-blacklist=', 'max-users=', 'min-users=', 'min-mbps=', 'max-ms=', 'proto=', 'list', 'skip'])
     except getopt.GetoptError:
         print("  unable to parse commandline arguments;\
                 \n  getopts parsing error.\
@@ -458,6 +465,8 @@ def main(argv):
             cliargs._mbps_min = float(arg)
         elif opt in ('-M', '--max-ms'):
             cliargs._ms_max = int(arg)
+        elif opt in ('-k', '--skip'):
+            cliargs._skip = int(arg)
         elif opt in ('-P', '--proto'):
             if arg in 'udp':
                 cliargs._proto = 'udp'
@@ -523,6 +532,8 @@ def usage(argv=None):
             \n\t\t\t\t\t  integer values only.\
             \n  -p, --proto\t\t\t\tovpn file conection type.\
             \n\t\t\t\t\t  either 'tcp' or 'udp'\
+            \n  -k, --skip\t\t\t\tnumber of vpns to skip from top.\
+            \n\t\t\t\t\t  integer values only.\
             \n\nExit status:\
             \n 0 if OK,\
             \n 1 if minor (e.g.,  cannot access site),\

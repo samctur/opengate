@@ -5,7 +5,7 @@ and parse the desired vpn.
 
 Created by:
 
-  * samuelct <sam.champagne@dal.ca>
+  * Samuel Champagne
 
 
 ## Building

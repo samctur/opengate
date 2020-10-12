@@ -1,4 +1,4 @@
-#opengate project
+# Opengate Project
 
 short script to check available VPNs on vpngate.net
 and parse the desired vpn.

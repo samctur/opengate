@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#this file is intended to work under linux distributions
+
 git=`pwd`
 
 echo "looking for ${USER}/bin"

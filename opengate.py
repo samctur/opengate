@@ -30,9 +30,12 @@ import getopt
 import urllib2
 import subprocess
 
+
 class OpenNode(object):
     """
     VPN link objects
+
+    each Node is a different vpn and it's parsed information obtained from vpngate
     """ 
     def __init__(self, site='www.vpngate.net/en/', string=None, country=None, ip=None, total=0,  mbps=0.0, ms=0, vpn=None):
         """Constructor"""
@@ -85,7 +88,7 @@ class OpenNode(object):
 
 class HeapGate(object):
     """
-    Heap Datastructure.
+    Heap Datastructure to store and access OpenNodes
     Mbps as order of priority.
     """
 
@@ -183,7 +186,7 @@ class HeapGate(object):
 
 class CliArg(object):
     """
-    keeps track of command line arguments passed
+    keeps track of command line arguments passed for code reusability
     """
     def __init__(self, site='www.vpngate.net/en/',v=False,  p='tcp', c=[], C=[], s=[], S=[], u=None, U=None, m=None, M=None, k=0):
         """Constructor"""
@@ -239,7 +242,7 @@ class CliArg(object):
         print(" {0}, c={1}, C={2}, s={3}, S={4}, u={5}, U={6}, m={7}, M={8} k={9}".format(self._site, self._country_whitelist, self._country_blacklist, self._ip_whitelist, self._ip_blacklist, self._users_min, self._users_max, self._mbps_min, self._ms_max, self._skip))
 
     def _parse_cliargs(self, node, heap=HeapGate()):
-        "parse VPNs found, only adding if desired"
+        "parse VPNs found, skipping undesirables"
         if self._country_whitelist:
             if self._country_whitelist in "--list":
                 if node._country in heap._countries:
@@ -278,10 +281,10 @@ class CliArg(object):
 
 
 """
-Main methods
+Main methods to initiate parsing
 """
 def _getall(cliargs=CliArg(), heap=HeapGate()):
-    """Get all VPN tupples"""
+    """Get all VPN tupples from vpngate"""
     site = 'http://'+cliargs._site 
     recomp = re.compile(r'<td class=\'vg_table_row_[0-1].*?\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}.*?Total.*?Ping:.*?Logging\spolicy.*?\n')
     count = 0
@@ -293,26 +296,27 @@ def _getall(cliargs=CliArg(), heap=HeapGate()):
                 \n  .....\
                 \n  check network connectivity and site status.")
         sys.exit(1)
-    "check verbose"
+    "check verbose -v requirement"
     if cliargs._verbose:
         print(" . . .\n parsing...\n . . .")  
         cliargs.__str__()
         print(' . . .')
     for x in re.findall(recomp, data):
-        "parse each vpn on site"
+        "parse each vpn on site and add to heap"
         count += _parse(x, cliargs, heap)
     "check if further parsing needed"
     if heap._countries:
         for x in heap._countries:
             print(x)
         sys.exit(0)
+    "check verbose -v requirement"
     if cliargs._verbose:
         print(" found {0} matching VPNs\n . . .".format(count))
         heap.__str__()
     _getbest(cliargs, heap)
 
 def _getbest(cliargs=CliArg(), heap=HeapGate()):
-    """Get best vpn from AVL Heap"""
+    """Get best vpn from Max Heap"""
     kskip = cliargs._skip;
     found = False
     while not found and len(heap._heap) is not 0:

@@ -185,7 +185,7 @@ class CliArg(object):
     """
     keeps track of command line arguments passed
     """
-    def __init__(self, site='www.vpngate.net/en/',v=False,  p='tcp', c=[], C=[], s=[], S=[], u=None, U=None, m=None, M=None, k=None):
+    def __init__(self, site='www.vpngate.net/en/',v=False,  p='tcp', c=[], C=[], s=[], S=[], u=None, U=None, m=None, M=None, k=0):
         """Constructor"""
         self._site = site 
         "vpn website"
